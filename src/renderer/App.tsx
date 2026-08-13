@@ -8,7 +8,10 @@ import {
   SCREEN_IDS,
   type ScreenId,
 } from '@renderer/constants/navigation';
-import { SCREEN_TRANSITION_MIN_DURATION_MS } from '@renderer/constants/ui';
+import {
+  SCREEN_TRANSITION_MIN_DURATION_MS,
+  SPINNER_DELAY_MS,
+} from '@renderer/constants/ui';
 import { useAppData } from '@renderer/contexts/AppDataContext';
 import { ExpenseDetailScreen } from '@renderer/screens/expense-detail/ExpenseDetailScreen';
 import { ExpenseEntryScreen } from '@renderer/screens/expense-entry/ExpenseEntryScreen';
@@ -33,6 +36,13 @@ export type EntryMode = (typeof ENTRY_MODES)[keyof typeof ENTRY_MODES];
 export interface NavigateTarget {
   mode?: EntryMode;
   expenseId?: number | null;
+  /**
+   * 遷移ローディングをすぐには出さない。
+   * 前後の領収書のように同じ画面で対象だけ差し替える移動では、
+   * 毎回ローディングを挟むとかえって待たされて見えるため、
+   * 読み込みに時間がかかったときだけ出す。
+   */
+  quiet?: boolean;
 }
 
 export type NavigateFn = (screenId: ScreenId, target?: NavigateTarget) => void;
@@ -62,8 +72,12 @@ export const App = (): JSX.Element => {
   /** 初期セットアップを終えた直後だけ出す案内 */
   const [welcomeVisible, setWelcomeVisible] = useState(false);
 
-  const transitionStartedAt = useRef(Date.now());
+  /** ローディングを出し始めた時刻。最低表示時間の判定に使う */
+  const shownAt = useRef<number | null>(Date.now());
+  /** 最低表示時間ぶん残すためのタイマー */
   const readyTimer = useRef<number | null>(null);
+  /** 「遅いときだけ出す」遷移で、表示を待つためのタイマー */
+  const delayTimer = useRef<number | null>(null);
   /**
    * 経費一覧の絞り込みとページ。照会画面へ出ている間だけ預かる。
    * ここでは描画に使わないので state ではなく ref に置き、
@@ -78,14 +92,18 @@ export const App = (): JSX.Element => {
     }
   }, [initialized, settings.sideMenuCollapsed]);
 
-  useEffect(
-    () => () => {
-      if (readyTimer.current !== null) {
-        window.clearTimeout(readyTimer.current);
-      }
-    },
-    [],
-  );
+  const clearTransitionTimers = useCallback(() => {
+    if (readyTimer.current !== null) {
+      window.clearTimeout(readyTimer.current);
+      readyTimer.current = null;
+    }
+    if (delayTimer.current !== null) {
+      window.clearTimeout(delayTimer.current);
+      delayTimer.current = null;
+    }
+  }, []);
+
+  useEffect(() => () => clearTransitionTimers(), [clearTransitionTimers]);
 
   const handleToggleMenu = useCallback(() => {
     setCollapsed((current) => {
@@ -104,26 +122,44 @@ export const App = (): JSX.Element => {
     expenseListState.current = state;
   }, []);
 
-  const beginTransition = useCallback(() => {
-    if (readyTimer.current !== null) {
-      window.clearTimeout(readyTimer.current);
-      readyTimer.current = null;
-    }
-    transitionStartedAt.current = Date.now();
-    setScreenLoading(true);
-  }, []);
+  const beginTransition = useCallback(
+    (quiet: boolean) => {
+      clearTransitionTimers();
+
+      if (!quiet) {
+        shownAt.current = Date.now();
+        setScreenLoading(true);
+        return;
+      }
+
+      // 待たされていると感じる時間を超えたときだけローディングに切り替える
+      shownAt.current = null;
+      setScreenLoading(false);
+      delayTimer.current = window.setTimeout(() => {
+        delayTimer.current = null;
+        shownAt.current = Date.now();
+        setScreenLoading(true);
+      }, SPINNER_DELAY_MS);
+    },
+    [clearTransitionTimers],
+  );
 
   /**
    * 遷移先の初期データが揃ったときに呼ばれる。
    * 取得が速いと一瞬で消えて遷移したことが伝わらないため、最低表示時間だけは残す。
+   * まだ出していない（＝待たせていない）場合は、そのまま出さずに終える。
    */
   const handleScreenReady = useCallback(() => {
-    const remaining =
-      SCREEN_TRANSITION_MIN_DURATION_MS - (Date.now() - transitionStartedAt.current);
-    if (readyTimer.current !== null) {
-      window.clearTimeout(readyTimer.current);
-      readyTimer.current = null;
+    const notShownYet = delayTimer.current !== null;
+    const startedAt = shownAt.current;
+    clearTransitionTimers();
+
+    if (notShownYet || startedAt === null) {
+      setScreenLoading(false);
+      return;
     }
+
+    const remaining = SCREEN_TRANSITION_MIN_DURATION_MS - (Date.now() - startedAt);
     if (remaining <= 0) {
       setScreenLoading(false);
       return;
@@ -132,7 +168,7 @@ export const App = (): JSX.Element => {
       readyTimer.current = null;
       setScreenLoading(false);
     }, remaining);
-  }, []);
+  }, [clearTransitionTimers]);
 
   const navigate = useCallback<NavigateFn>(
     (screenId, target) => {
@@ -151,7 +187,7 @@ export const App = (): JSX.Element => {
         });
         setTargetSequence((current) => current + 1);
       }
-      beginTransition();
+      beginTransition(target?.quiet ?? false);
       setCurrentScreenId(screenId);
     },
     [currentScreenId, targetSequence, beginTransition],
@@ -170,8 +206,9 @@ export const App = (): JSX.Element => {
         );
       case SCREEN_IDS.DETAIL:
         return (
+          // 前後の領収書へ移る間も表示を保てるよう、ここでは作り直さない
+          // （対象 ID の変化を照会画面側が拾って読み直す）
           <ExpenseDetailScreen
-            key={screenTarget.key}
             expenseId={screenTarget.expenseId}
             listState={expenseListState.current}
             onListStateChange={handleExpenseListStateChange}

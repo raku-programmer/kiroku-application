@@ -9,6 +9,21 @@ export const WINDOW_CONFIG = {
   title: 'Kiroku',
 } as const;
 
+/**
+ * 領収書を大きく表示する別ウィンドウ。
+ * 画像・PDF をそのまま読み込み、Chromium 内蔵のビューアに表示させる。
+ */
+export const ATTACHMENT_WINDOW_CONFIG = {
+  defaultWidth: 960,
+  defaultHeight: 880,
+  minWidth: 480,
+  minHeight: 400,
+  /** 画像・PDF の周囲に出る余白の色（内蔵ビューアの背景に合わせた暗色） */
+  backgroundColor: '#282d2a',
+  /** タイトルバーに出す文字。後ろにファイル名が付く */
+  titlePrefix: '領収書：',
+} as const;
+
 /** アプリ名。ファイル名テンプレートなどで使用する。 */
 export const APP_NAME = 'Kiroku';
 

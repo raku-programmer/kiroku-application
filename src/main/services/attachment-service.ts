@@ -16,11 +16,13 @@ import {
   listAttachmentsByExpense,
 } from '@main/db/repositories/attachment-repository';
 import { AppException, notFoundError, validationError } from '@main/errors';
+import { showAttachmentWindow } from '@main/windows/attachment-window';
 import { ERROR_CODES } from '@shared/constants/error-codes';
 import {
   ALLOWED_ATTACHMENT_EXTENSIONS,
   ATTACHMENT_FILE_FILTERS,
   ATTACHMENT_MIME_TYPES,
+  ATTACHMENT_PREVIEW_KINDS,
   CLIPBOARD_FILE_EXTENSION,
   CLIPBOARD_FILE_PREFIX,
   COMPRESSIBLE_IMAGE_EXTENSIONS,
@@ -32,8 +34,17 @@ import {
   IMPORT_THUMBNAIL_MAX_EDGE_PIXELS,
   MAX_ATTACHMENTS_PER_EXPENSE,
   MAX_ATTACHMENT_BYTE_SIZE,
+  PDF_EXTENSION,
+  PREVIEWABLE_IMAGE_EXTENSIONS,
+  type AttachmentPreviewKind,
 } from '@shared/constants/attachments';
-import type { Attachment, AttachmentDraft, ImportCandidate } from '@shared/types/expense';
+import type {
+  Attachment,
+  AttachmentContent,
+  AttachmentDraft,
+  AttachmentSource,
+  ImportCandidate,
+} from '@shared/types/expense';
 import { formatByteSize } from '@shared/utils/format';
 import { toTimestampString } from '@shared/utils/period';
 
@@ -323,8 +334,8 @@ export const removeAttachmentFiles = async (attachments: Attachment[]): Promise<
   await Promise.all(attachments.map((attachment) => removeFileQuietly(attachment.storedPath)));
 };
 
-/** 添付ファイルを既定のアプリで開く。 */
-export const openAttachment = async (attachmentId: number): Promise<void> => {
+/** 添付を 1 件取り出す。レコードと実体の両方が揃っていなければエラーにする。 */
+const requireStoredAttachment = (attachmentId: number): Attachment => {
   const attachment = findAttachment(attachmentId);
   if (!attachment) {
     throw notFoundError('添付ファイルが見つかりません。');
@@ -335,6 +346,69 @@ export const openAttachment = async (attachmentId: number): Promise<void> => {
       'ファイルの実体が見つかりません。移動または削除された可能性があります。',
     );
   }
+  return attachment;
+};
+
+/** 画面での出し方を拡張子から決める。 */
+const resolvePreviewKind = (filePath: string): AttachmentPreviewKind => {
+  const extension = getExtension(filePath);
+  if (extension === PDF_EXTENSION) {
+    return ATTACHMENT_PREVIEW_KINDS.PDF;
+  }
+  return PREVIEWABLE_IMAGE_EXTENSIONS.includes(extension)
+    ? ATTACHMENT_PREVIEW_KINDS.IMAGE
+    : ATTACHMENT_PREVIEW_KINDS.UNSUPPORTED;
+};
+
+/**
+ * プレビューする実ファイルを決める。
+ * 保存済みの添付は保存先を、まだ保存していない添付は選択元をそのまま見る。
+ * 選択元を見る場合も、添付するときと同じ条件（拡張子・サイズ）で受け付ける。
+ */
+const resolvePreviewTarget = async (
+  source: AttachmentSource,
+): Promise<{ filePath: string; fileName: string }> => {
+  if ('id' in source) {
+    const attachment = requireStoredAttachment(source.id);
+    return { filePath: attachment.storedPath, fileName: attachment.originalName };
+  }
+  const [draft] = await resolveAttachmentDrafts([source.sourcePath]);
+  return { filePath: source.sourcePath, fileName: draft.originalName };
+};
+
+/**
+ * 添付欄のプレビュー用にファイルを読み出す。
+ * 画面に出せない形式（HEIC など）は中身を読まず、種別だけ返して案内に切り替えさせる。
+ */
+export const readAttachmentContent = async (
+  source: AttachmentSource,
+): Promise<AttachmentContent> => {
+  const { filePath } = await resolvePreviewTarget(source);
+  const kind = resolvePreviewKind(filePath);
+
+  return {
+    mimeType: resolveMimeType(filePath),
+    kind,
+    bytes:
+      kind === ATTACHMENT_PREVIEW_KINDS.UNSUPPORTED ? null : await fsp.readFile(filePath),
+  };
+};
+
+/** 添付ファイルを別ウィンドウで大きく表示する。 */
+export const openAttachmentInWindow = async (
+  source: AttachmentSource,
+  parentWindow: BrowserWindow | null,
+): Promise<void> => {
+  const { filePath, fileName } = await resolvePreviewTarget(source);
+  if (resolvePreviewKind(filePath) === ATTACHMENT_PREVIEW_KINDS.UNSUPPORTED) {
+    throw validationError('この形式は画面に表示できません。既定のアプリで開いてください。');
+  }
+  showAttachmentWindow(filePath, fileName, parentWindow);
+};
+
+/** 添付ファイルを既定のアプリで開く。 */
+export const openAttachment = async (attachmentId: number): Promise<void> => {
+  const attachment = requireStoredAttachment(attachmentId);
   const errorMessage = await shell.openPath(attachment.storedPath);
   if (errorMessage) {
     throw new AppException(ERROR_CODES.FILE_ERROR, errorMessage);

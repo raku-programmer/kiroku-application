@@ -37,6 +37,8 @@ export const createMainWindow = (): BrowserWindow => {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
+      // 経費照会のプレビューで PDF を表示するために必要（Chromium 内蔵ビューア）
+      plugins: true,
     },
   });
 

@@ -1,3 +1,4 @@
+import type { AttachmentPreviewKind } from '@shared/constants/attachments';
 import type { TaxTreatment } from '@shared/constants/tax';
 
 /** 領収書などの添付ファイル */
@@ -21,6 +22,23 @@ export interface AttachmentDraft {
   /** 新規追加時のみ。コピー元のフルパス */
   sourcePath: string | null;
   byteSize: number;
+}
+
+/**
+ * プレビューで表示する対象の指し方。
+ * 保存済みの添付は ID、まだ保存していない添付は選択元のフルパスで指す。
+ */
+export type AttachmentSource = { id: number } | { sourcePath: string };
+
+/**
+ * プレビュー用に読み出した添付ファイルの中身。
+ * renderer 側で Blob URL にしてから表示する。
+ */
+export interface AttachmentContent {
+  mimeType: string | null;
+  kind: AttachmentPreviewKind;
+  /** ファイルの中身。表示できない形式（kind が unsupported）のときは読まずに null */
+  bytes: Uint8Array | null;
 }
 
 /**

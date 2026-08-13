@@ -5,7 +5,6 @@ import {
   type ExpenseListState,
   type NavigateFn,
 } from '@renderer/App';
-import { LoadingOverlay, OVERLAY_VARIANTS } from '@renderer/components/feedback/LoadingOverlay';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -46,6 +45,9 @@ interface ExpenseDetailScreenProps {
  * 入力画面と同じフォームをそのまま出し、この画面で修正・削除まで完結させる。
  * 一覧の並び順で前後の領収書へ移動できるので、CSV 取り込み後に
  * 画像を順番に付けていく作業がこの画面だけで済む。
+ *
+ * 前後移動ではこの画面を作り直さず、対象 ID だけを差し替える。
+ * 表示中の内容を残したまま次を読み込めるので、間に空白の画面を挟まずに切り替わる。
  */
 export const ExpenseDetailScreen = ({
   expenseId,
@@ -54,12 +56,13 @@ export const ExpenseDetailScreen = ({
   onReady,
   onNavigate,
 }: ExpenseDetailScreenProps): JSX.Element => {
-  const loadAction = useAsyncAction();
   const commandAction = useAsyncAction();
   const formState = useExpenseForm();
   const { loadFromExpense, toInput } = formState;
 
   const [expense, setExpense] = useState<Expense | null>(null);
+  /** 読み込みを試して見つからなかったか。読み込み中と区別して案内を出し分ける */
+  const [notFound, setNotFound] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   /** 未保存のまま移動しようとしたときの行き先。確認してから移動する */
@@ -78,10 +81,20 @@ export const ExpenseDetailScreen = ({
           if (!canceled) {
             setExpense(loaded);
             loadFromExpense(loaded, true);
+            setNotFound(false);
+            setFieldErrors({});
+            // 読み込んだ内容を新しい変更判定の基準にし直す
+            baseline.current = null;
           }
         } catch {
           // 見つからない場合は「対象なし」の表示にする
+          if (!canceled) {
+            setExpense(null);
+            setNotFound(true);
+          }
         }
+      } else if (!canceled) {
+        setNotFound(true);
       }
       if (!canceled) {
         onReady();
@@ -140,7 +153,9 @@ export const ExpenseDetailScreen = ({
           page: Math.floor(index / EXPENSE_LIST_PAGE_SIZE) + FIRST_PAGE,
         });
       }
-      onNavigate(SCREEN_IDS.DETAIL, { expenseId: targetId });
+      // 同じ画面で対象を差し替えるだけなので、遷移ローディングは出さない
+      // （読み込みに時間がかかったときだけ App 側が出す）
+      onNavigate(SCREEN_IDS.DETAIL, { expenseId: targetId, quiet: true });
     },
     [listState, onListStateChange, onNavigate, siblingIds],
   );
@@ -196,9 +211,13 @@ export const ExpenseDetailScreen = ({
   };
 
   if (!expense) {
+    // 読み込み中は何も出さない（遅いときだけ App が遷移ローディングを重ねる）
+    if (!notFound) {
+      return <div className="screen" />;
+    }
     return (
       <div className="screen">
-        <Card title={LABELS.detail.title} relative>
+        <Card title={LABELS.detail.title}>
           <p className="detail-empty">{LABELS.detail.notFound}</p>
           <div className="detail-actions">
             <Button
@@ -208,7 +227,6 @@ export const ExpenseDetailScreen = ({
               {LABELS.detail.backToList}
             </Button>
           </div>
-          <LoadingOverlay visible={loadAction.isSpinning} variant={OVERLAY_VARIANTS.SECTION} />
         </Card>
       </div>
     );
@@ -221,7 +239,6 @@ export const ExpenseDetailScreen = ({
       <Card
         title={LABELS.detail.title}
         description={LABELS.detail.description}
-        relative
         actions={
           hasSiblings ? (
             <div className="detail-stepper">
@@ -279,7 +296,11 @@ export const ExpenseDetailScreen = ({
               >
                 {LABELS.common.duplicate}
               </Button>
-              <Button type="submit" variant={BUTTON_VARIANTS.PRIMARY} loading={commandAction.isBusy}>
+              <Button
+                type="submit"
+                variant={BUTTON_VARIANTS.PRIMARY}
+                loading={commandAction.isBusy}
+              >
                 {LABELS.common.update}
               </Button>
               <Button
@@ -299,8 +320,6 @@ export const ExpenseDetailScreen = ({
           {' / '}
           {`${LABELS.detail.updatedAt}：${formatDateTime(expense.updatedAt)}`}
         </p>
-
-        <LoadingOverlay visible={loadAction.isSpinning} variant={OVERLAY_VARIANTS.SECTION} />
       </Card>
 
       <ConfirmDialog

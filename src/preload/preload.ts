@@ -65,6 +65,8 @@ const api: KirokuApi = {
     pick: () => invoke(IPC_CHANNELS.ATTACHMENT_PICK),
     resolvePaths: (paths) => invoke(IPC_CHANNELS.ATTACHMENT_RESOLVE_PATHS, paths),
     open: (attachmentId) => invoke(IPC_CHANNELS.ATTACHMENT_OPEN, attachmentId),
+    read: (source) => invoke(IPC_CHANNELS.ATTACHMENT_READ, source),
+    openInWindow: (source) => invoke(IPC_CHANNELS.ATTACHMENT_OPEN_WINDOW, source),
     fromClipboard: () => invoke(IPC_CHANNELS.ATTACHMENT_FROM_CLIPBOARD),
     listImportCandidates: () => invoke(IPC_CHANNELS.ATTACHMENT_LIST_IMPORT_CANDIDATES),
     // ドロップされた File から実パスを得る（Electron 32 以降は File.path が使えない）

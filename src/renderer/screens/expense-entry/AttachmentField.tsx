@@ -10,6 +10,7 @@ import {
 } from '@renderer/components/icons/Icons';
 import { LABELS } from '@renderer/constants/labels';
 import { useAsyncAction } from '@renderer/hooks/useAsyncAction';
+import { AttachmentViewer } from '@renderer/screens/expense-entry/AttachmentViewer';
 import { ImportPickerDialog } from '@renderer/screens/expense-entry/ImportPickerDialog';
 import type { AttachmentDraft } from '@shared/types/expense';
 import { formatByteSize } from '@shared/utils/format';
@@ -114,79 +115,88 @@ export const AttachmentField = ({
   };
 
   return (
-    <div
-      className={`attachment-field${dragging ? ' attachment-field--dragging' : ''}`}
-      onDragOver={(event) => {
-        event.preventDefault();
-        setDragging(true);
-      }}
-      onDragLeave={() => setDragging(false)}
-      onDrop={(event) => void handleDrop(event)}
-    >
-      <div className="attachment-field__actions">
-        <Button
-          variant={BUTTON_VARIANTS.SECONDARY}
-          size={BUTTON_SIZES.SMALL}
-          icon={<PlusIcon width={16} height={16} />}
-          onClick={() => void handlePick()}
-          disabled={disabled}
-          loading={isBusy}
-        >
-          {LABELS.entry.attachmentAdd}
-        </Button>
-        <Button
-          variant={BUTTON_VARIANTS.SECONDARY}
-          size={BUTTON_SIZES.SMALL}
-          icon={<ClipboardIcon width={16} height={16} />}
-          onClick={() => void handlePasteFromClipboard()}
-          disabled={disabled || isBusy}
-        >
-          {LABELS.entry.attachmentPaste}
-        </Button>
-        <Button
-          variant={BUTTON_VARIANTS.SECONDARY}
-          size={BUTTON_SIZES.SMALL}
-          icon={<FolderIcon width={16} height={16} />}
-          onClick={() => setImportPickerOpen(true)}
-          disabled={disabled || isBusy}
-        >
-          {LABELS.entry.attachmentFromFolder}
-        </Button>
-      </div>
-      <p className="attachment-field__hint">{LABELS.entry.attachmentDropHint}</p>
+    <div className="attachment-field">
+      <div
+        className={`attachment-field__dropzone${
+          dragging ? ' attachment-field__dropzone--dragging' : ''
+        }`}
+        onDragOver={(event) => {
+          event.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(event) => void handleDrop(event)}
+      >
+        <div className="attachment-field__actions">
+          <Button
+            variant={BUTTON_VARIANTS.SECONDARY}
+            size={BUTTON_SIZES.SMALL}
+            icon={<PlusIcon width={16} height={16} />}
+            onClick={() => void handlePick()}
+            disabled={disabled}
+            loading={isBusy}
+          >
+            {LABELS.entry.attachmentAdd}
+          </Button>
+          <Button
+            variant={BUTTON_VARIANTS.SECONDARY}
+            size={BUTTON_SIZES.SMALL}
+            icon={<ClipboardIcon width={16} height={16} />}
+            onClick={() => void handlePasteFromClipboard()}
+            disabled={disabled || isBusy}
+          >
+            {LABELS.entry.attachmentPaste}
+          </Button>
+          <Button
+            variant={BUTTON_VARIANTS.SECONDARY}
+            size={BUTTON_SIZES.SMALL}
+            icon={<FolderIcon width={16} height={16} />}
+            onClick={() => setImportPickerOpen(true)}
+            disabled={disabled || isBusy}
+          >
+            {LABELS.entry.attachmentFromFolder}
+          </Button>
+        </div>
+        <p className="attachment-field__hint">{LABELS.entry.attachmentDropHint}</p>
 
-      {attachments.length > 0 && (
-        <ul className="attachment-field__list">
-          {attachments.map((attachment, index) => (
-            <li className="attachment-field__item" key={`${attachment.id ?? 'new'}-${index}`}>
-              <PaperclipIcon width={16} height={16} />
-              {attachment.id != null ? (
+        {attachments.length > 0 && (
+          <ul className="attachment-field__list">
+            {attachments.map((attachment, index) => (
+              <li className="attachment-field__item" key={`${attachment.id ?? 'new'}-${index}`}>
+                <PaperclipIcon width={16} height={16} />
+                {attachment.id != null ? (
+                  <button
+                    type="button"
+                    className="attachment-field__name attachment-field__name--link"
+                    onClick={() => void handleOpen(attachment)}
+                    title={LABELS.common.open}
+                  >
+                    {attachment.originalName}
+                  </button>
+                ) : (
+                  <span className="attachment-field__name">{attachment.originalName}</span>
+                )}
+                <span className="attachment-field__size">
+                  {formatByteSize(attachment.byteSize)}
+                </span>
                 <button
                   type="button"
-                  className="attachment-field__name attachment-field__name--link"
-                  onClick={() => void handleOpen(attachment)}
-                  title={LABELS.common.open}
+                  className="attachment-field__remove"
+                  onClick={() => handleRemove(index)}
+                  disabled={disabled}
+                  aria-label={LABELS.entry.attachmentRemove}
+                  title={LABELS.entry.attachmentRemove}
                 >
-                  {attachment.originalName}
+                  <CloseIcon width={14} height={14} />
                 </button>
-              ) : (
-                <span className="attachment-field__name">{attachment.originalName}</span>
-              )}
-              <span className="attachment-field__size">{formatByteSize(attachment.byteSize)}</span>
-              <button
-                type="button"
-                className="attachment-field__remove"
-                onClick={() => handleRemove(index)}
-                disabled={disabled}
-                aria-label={LABELS.entry.attachmentRemove}
-                title={LABELS.entry.attachmentRemove}
-              >
-                <CloseIcon width={14} height={14} />
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* 添付したファイルの中身は、一覧のすぐ下でそのまま確認できるようにする */}
+      <AttachmentViewer attachments={attachments} />
 
       <ImportPickerDialog
         open={importPickerOpen}

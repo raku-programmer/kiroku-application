@@ -21,6 +21,34 @@ export const ATTACHMENT_FILE_FILTERS: readonly FileTypeFilter[] = [
   { name: 'すべてのファイル', extensions: ['*'] },
 ];
 
+/**
+ * 画面にそのまま表示できる画像の拡張子（小文字・ドットなし）。
+ * HEIC は Chromium が描画できないため含めない（既定のアプリで開いてもらう）。
+ */
+export const PREVIEWABLE_IMAGE_EXTENSIONS: readonly string[] = [
+  'png',
+  'jpg',
+  'jpeg',
+  'gif',
+  'webp',
+];
+
+/** PDF の拡張子。プレビューは Chromium 内蔵のビューアに任せる */
+export const PDF_EXTENSION = 'pdf';
+
+/** 経費照会のプレビューでの出し方 */
+export const ATTACHMENT_PREVIEW_KINDS = {
+  /** img 要素で表示する */
+  IMAGE: 'image',
+  /** iframe に読み込んで内蔵ビューアで表示する */
+  PDF: 'pdf',
+  /** 画面には出せない形式（HEIC など） */
+  UNSUPPORTED: 'unsupported',
+} as const;
+
+export type AttachmentPreviewKind =
+  (typeof ATTACHMENT_PREVIEW_KINDS)[keyof typeof ATTACHMENT_PREVIEW_KINDS];
+
 /** 拡張子（小文字・ドットなし）から MIME タイプを引く */
 export const ATTACHMENT_MIME_TYPES: Readonly<Record<string, string>> = {
   pdf: 'application/pdf',

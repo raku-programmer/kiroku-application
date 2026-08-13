@@ -1,8 +1,17 @@
+/* 添付の操作欄と、その下に続くプレビューをまとめる入れ物 */
 .attachment-field {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
   width: 100%;
+  min-width: 0;
+}
+
+/* ファイルを落とせる範囲。操作ボタンと添付一覧を囲う */
+.attachment-field__dropzone {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
   padding: var(--space-3);
   background-color: var(--color-surface-muted);
   border: 1px dashed var(--color-border-strong);
@@ -12,7 +21,7 @@
     background-color var(--transition-fast);
 }
 
-.attachment-field--dragging {
+.attachment-field__dropzone--dragging {
   background-color: var(--color-primary-50);
   border-color: var(--color-primary-400);
 }

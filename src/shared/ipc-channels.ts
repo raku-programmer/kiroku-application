@@ -46,6 +46,10 @@ export const IPC_CHANNELS = {
   ATTACHMENT_PICK: 'attachment:pick',
   ATTACHMENT_RESOLVE_PATHS: 'attachment:resolve-paths',
   ATTACHMENT_OPEN: 'attachment:open',
+  /** 経費照会のプレビューに出すため、添付ファイルの中身を読み出す */
+  ATTACHMENT_READ: 'attachment:read',
+  /** 添付ファイルを別ウィンドウで大きく表示する */
+  ATTACHMENT_OPEN_WINDOW: 'attachment:open-window',
   /** クリップボードの画像を添付候補にする */
   ATTACHMENT_FROM_CLIPBOARD: 'attachment:from-clipboard',
   /** 取り込みフォルダにあるファイルを新しい順に返す */

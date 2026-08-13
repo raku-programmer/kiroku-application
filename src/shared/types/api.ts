@@ -4,7 +4,9 @@ import type {
   CsvImportPreview,
 } from '@shared/types/csv-import';
 import type {
+  AttachmentContent,
   AttachmentDraft,
+  AttachmentSource,
   Expense,
   ExpenseFilter,
   ExpenseInput,
@@ -111,6 +113,10 @@ export interface KirokuApi {
     /** ドラッグ&ドロップで得たパスを添付候補に変換する */
     resolvePaths(paths: string[]): Promise<Result<AttachmentDraft[]>>;
     open(attachmentId: number): Promise<Result<null>>;
+    /** プレビュー表示のために中身を読み出す（保存前のファイルも指定できる） */
+    read(source: AttachmentSource): Promise<Result<AttachmentContent>>;
+    /** 別ウィンドウで大きく表示する（画像・PDF のみ） */
+    openInWindow(source: AttachmentSource): Promise<Result<null>>;
     /** クリップボードの画像を添付候補にする。画像が無ければエラー */
     fromClipboard(): Promise<Result<AttachmentDraft[]>>;
     /** 取り込みフォルダのファイルをサムネイル付きで新しい順に返す */
