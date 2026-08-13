@@ -1,0 +1,223 @@
+.list-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.list-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-4);
+}
+
+.list-filters__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 130px;
+}
+
+.list-filters__item--grow {
+  flex: 1;
+  min-width: 220px;
+}
+
+.list-filters__label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.list-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.list-summary__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background-color: var(--color-surface-muted);
+  border-radius: var(--radius-md);
+}
+
+.list-summary__item--highlight {
+  color: var(--color-primary-800);
+  background-color: var(--color-primary-100);
+}
+
+.list-summary__label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.list-summary__item--highlight .list-summary__label {
+  color: var(--color-primary-700);
+}
+
+.list-summary__value {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  text-align: left;
+}
+
+.list-table__wrapper {
+  /* 横スクロールさせない。角丸からのはみ出しだけ抑える */
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.list-table {
+  width: 100%;
+  /* 列幅を colgroup で固定し、長い文字が入っても表を広げない */
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+/*
+ * text-overflow は overflow: hidden と white-space: nowrap が
+ * 同じ要素に揃っていないと効かないため、セル側にまとめて指定する。
+ */
+.list-table th,
+.list-table td {
+  /*
+   * 横 padding を詰めているのは、最小ウィンドウ（1024px）でも
+   * 勘定科目・請求元に読める幅を残すため。
+   */
+  padding: var(--space-2);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.list-table thead th {
+  color: var(--color-primary-800);
+  font-weight: 600;
+  text-align: left;
+  background-color: var(--color-primary-50);
+}
+
+/*
+ * 内容が決まっている列は実測に合わせて固定し、残りを勘定科目と請求元で折半する。
+ * 金額と税区分は途中で切れると意味が変わってしまうため、
+ * 想定される最長表記（¥1,000,000,000 / 税抜 / 8%（軽減税率））が収まる幅を確保する。
+ */
+.list-table__col--date {
+  width: 92px;
+}
+
+.list-table__col--amount {
+  width: 124px;
+}
+
+.list-table__col--tax {
+  width: 152px;
+}
+
+.list-table__col--actions {
+  width: 120px;
+}
+
+.list-table thead th.numeric {
+  text-align: right;
+}
+
+.list-table tbody tr:hover {
+  background-color: var(--color-row-hover);
+}
+
+.list-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.list-table__empty {
+  padding: var(--space-6);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.list-table__actions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+/*
+ * アイコンだけのボタンにラベル用の余白は要らない。
+ * ここを詰めたぶんを勘定科目・請求元の表示幅に回す。
+ */
+.list-table__actions .button--small {
+  padding: 0 var(--space-2);
+}
+
+.list-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.list-pager__status,
+.list-pager__page {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.list-pager__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.list-breakdown {
+  margin-top: var(--space-5);
+}
+
+.list-breakdown__title {
+  margin-bottom: var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-primary-800);
+}
+
+.list-breakdown__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list-breakdown__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+  background-color: var(--color-surface-muted);
+  border-radius: var(--radius-sm);
+}
+
+.list-breakdown__name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list-breakdown__count {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.list-breakdown__amount {
+  font-weight: 600;
+  color: var(--color-primary-800);
+}

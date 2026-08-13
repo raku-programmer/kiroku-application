@@ -1,0 +1,33 @@
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* 前後の領収書へ移動する操作。カード見出しの右側に置く */
+.detail-stepper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.detail-stepper__position {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.detail-empty {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.detail-timestamps {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-align: right;
+  border-top: 1px solid var(--color-border);
+}

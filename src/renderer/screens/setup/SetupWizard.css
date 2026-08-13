@@ -1,0 +1,152 @@
+/*
+ * 初期セットアップはウィンドウ全体を使う。
+ * 中央に小さなカードを置くと周囲が余るだけなので、
+ * 見出し・ステップ・操作ボタンを上下に固定し、本文だけをスクロールさせる。
+ */
+
+.setup {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--color-bg);
+}
+
+.setup__header {
+  flex: none;
+  padding: var(--space-4) var(--space-6);
+  color: var(--sidemenu-text-active);
+  background-color: var(--color-primary-700);
+}
+
+.setup__heading {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.setup__app {
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.setup__title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+}
+
+.setup__description {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-sm);
+  opacity: 0.9;
+}
+
+.setup__steps {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+  padding: var(--space-3) var(--space-6);
+  list-style: none;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.setup__step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.setup__step-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+.setup__step--current {
+  font-weight: 700;
+  color: var(--color-primary-800);
+}
+
+.setup__step--current .setup__step-mark {
+  color: var(--sidemenu-text-active);
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+}
+
+.setup__step--done {
+  color: var(--color-primary-700);
+}
+
+.setup__step--done .setup__step-mark {
+  color: var(--color-primary-700);
+  background-color: var(--color-primary-50);
+  border-color: var(--color-primary-200);
+}
+
+/* スクロールしてもローディングが動かないよう、覆う側は固定にする */
+.setup__main {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.setup__body {
+  height: 100%;
+  padding: var(--space-5) var(--space-6);
+  overflow-y: auto;
+}
+
+.setup__step-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.setup__step-description {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.setup__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.setup__divider {
+  border-top: 1px solid var(--color-border);
+}
+
+.setup__actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+}
+
+.setup__progress {
+  margin-right: auto;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}

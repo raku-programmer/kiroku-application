@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!--
+    Kiroku のロゴマーク（文字なし）。アプリの図案はこのファイルが唯一の原典。
+    - サイドメニューの左上に表示する
+    - `npm run icons` が「キロク」の文字を足してアプリアイコン（PNG / ICO）を作る
+    配色は renderer/styles/tokens.css のプライマリ（緑）と揃えている。
+  -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5CB552" />
+      <stop offset="1" stop-color="#2E7D32" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect x="32" y="32" width="960" height="960" rx="208" fill="url(#bg)" />
+
+  <!-- 後ろに重なった紙 -->
+  <rect x="262" y="212" width="90" height="464" rx="26" fill="#2A7230" />
+
+  <!-- レシート本体（下辺はミシン目、右上は折り返し） -->
+  <path
+    fill="#FAFAF7"
+    d="M324 150 H700 L790 240 V686
+       L759.4 712 L728.8 686 L698.1 712 L667.5 686 L636.9 712 L606.3 686
+       L575.6 712 L545 686 L514.4 712 L483.8 686 L453.1 712 L422.5 686
+       L391.9 712 L361.3 686 L330.6 712 L300 686
+       V174 A24 24 0 0 1 324 150 Z" />
+  <!-- 折り返した角 -->
+  <path fill="#E4E7E1" d="M700 150 L790 240 H700 Z" />
+
+  <!-- 金額を表す ¥ -->
+  <g stroke="#2E7D32" stroke-width="34" stroke-linecap="round" fill="none">
+    <path d="M432 258 L512 356" />
+    <path d="M592 258 L512 356" />
+    <path d="M512 356 V474" />
+    <path d="M455 392 H569" />
+    <path d="M455 434 H569" />
+  </g>
+
+  <!-- 明細行 -->
+  <g fill="#A9D9A5">
+    <circle cx="372" cy="522" r="17" />
+    <circle cx="372" cy="592" r="17" />
+    <circle cx="372" cy="662" r="17" />
+  </g>
+  <g stroke="#A9D9A5" stroke-width="21" stroke-linecap="round">
+    <path d="M418 522 H656" />
+    <path d="M418 592 H656" />
+    <path d="M418 662 H620" />
+  </g>
+
+  <!-- 鉛筆（記録する） -->
+  <g>
+    <!-- 削り出した木の部分 -->
+    <path fill="#E8C68C" d="M672 700 L748.8 657.6 L691.2 614.4 Z" />
+    <!-- 芯 -->
+    <path fill="#1B5E20" d="M672 700 L696.4 685.8 L678.8 672.6 Z" />
+    <!-- 軸 -->
+    <path fill="#2E7D32" d="M691.2 614.4 L835.2 422.4 L892.8 465.6 L748.8 657.6 Z" />
+    <path fill="#3D9142" d="M720 636 L864 444 L892.8 465.6 L748.8 657.6 Z" />
+    <!-- 口金 -->
+    <path fill="#F6F6F3" d="M835.2 422.4 L871.2 374.4 L928.8 417.6 L892.8 465.6 Z" />
+  </g>
+
+  <!-- 記録できたことを示すチェック -->
+  <circle cx="812" cy="736" r="96" fill="#3D9142" />
+  <path
+    d="M764 736 L800 772 L862 704"
+    stroke="#FFFFFF" stroke-width="27" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+</svg>

@@ -1,0 +1,42 @@
+.app-layout {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+.app-layout__main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.app-layout__header {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: var(--header-height);
+  padding: 0 var(--space-6);
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.app-layout__title {
+  font-size: var(--font-size-xl);
+  color: var(--color-primary-800);
+}
+
+.app-layout__content {
+  position: relative;
+  flex: 1;
+  padding: var(--space-5) var(--space-6) var(--space-7);
+  overflow-y: auto;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}

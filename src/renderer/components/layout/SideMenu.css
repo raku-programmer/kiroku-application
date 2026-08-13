@@ -1,0 +1,115 @@
+.side-menu {
+  display: flex;
+  z-index: var(--z-sidemenu);
+  flex: none;
+  flex-direction: column;
+  width: var(--sidemenu-width-expanded);
+  height: 100%;
+  padding-bottom: var(--space-4);
+  overflow: hidden;
+  color: var(--sidemenu-text);
+  background-color: var(--sidemenu-bg);
+  transition: width var(--transition-base);
+}
+
+.side-menu--collapsed {
+  width: var(--sidemenu-width-collapsed);
+}
+
+.side-menu__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--header-height);
+  padding: 0 var(--space-3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.side-menu__toggle {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: inherit;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.side-menu__toggle:hover {
+  color: var(--sidemenu-text-active);
+  background-color: var(--sidemenu-bg-hover);
+}
+
+.side-menu__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.side-menu__logo {
+  flex: none;
+  /* 横幅はメニューの残り幅に収まる範囲で、できるだけ大きく取る */
+  width: auto;
+  height: 22px;
+}
+
+.side-menu__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-3) var(--space-2);
+  list-style: none;
+}
+
+.side-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 42px;
+  padding: 0 var(--space-3);
+  color: inherit;
+  font-size: var(--font-size-md);
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.side-menu__item:hover {
+  color: var(--sidemenu-text-active);
+  background-color: var(--sidemenu-bg-hover);
+}
+
+.side-menu__item--active {
+  color: var(--sidemenu-text-active);
+  font-weight: 600;
+  background-color: var(--sidemenu-bg-active);
+}
+
+.side-menu__item-label {
+  overflow: hidden;
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity var(--transition-fast);
+}
+
+.side-menu--collapsed .side-menu__item {
+  justify-content: center;
+  padding: 0;
+}
+
+.side-menu--collapsed .side-menu__item-label {
+  width: 0;
+  opacity: 0;
+}

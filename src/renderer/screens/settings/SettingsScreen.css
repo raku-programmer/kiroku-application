@@ -1,0 +1,104 @@
+/* 共通の入力部品のスタイルは SettingFields.css にある */
+
+.settings-grid {
+  margin-bottom: var(--space-4);
+}
+
+.settings-status {
+  margin-bottom: var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-sm);
+}
+
+.settings-status--ok {
+  color: var(--color-success);
+  background-color: var(--color-success-bg);
+}
+
+.settings-status--ng {
+  color: var(--color-danger);
+  background-color: var(--color-danger-bg);
+}
+
+.settings-readonly {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.settings-actions {
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-4) 0;
+}
+
+.settings-subtitle {
+  margin: var(--space-5) 0 var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-primary-800);
+}
+
+.settings-empty {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.settings-backups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.settings-backups__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-surface-muted);
+  border-radius: var(--radius-sm);
+}
+
+.settings-backups__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-backups__meta {
+  flex: none;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.settings-locations {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.settings-locations dt {
+  margin-bottom: var(--space-1);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.settings-locations dd {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.settings-divider {
+  margin: var(--space-5) 0;
+  border-top: 1px solid var(--color-border);
+}
