@@ -12,8 +12,10 @@ export interface ExpenseExportRow {
   amountTaxIncluded: number;
   amountTaxExcluded: number;
   taxAmount: number;
-  allocationRatePercent: number;
-  allocatedAmount: number;
+  /** 「按分なし」の経費は数値ではなく ALLOCATION_DELEGATED_CELL を入れる */
+  allocationRatePercent: number | string;
+  /** 同上。金額が確定していないため合計にも含めない */
+  allocatedAmount: number | string;
   attachmentNames: string;
   note: string;
 }
@@ -76,8 +78,9 @@ export const EXPENSE_EXPORT_COLUMNS: readonly ExportColumnDefinition[] = [
   },
   {
     key: 'allocationRatePercent',
+    // 「按分未対応」が収まる幅にしている
     header: '按分率',
-    width: 10,
+    width: 12,
     numFmt: NUMBER_FORMATS.PERCENT,
     alignment: CELL_ALIGNMENTS.RIGHT,
   },
@@ -102,6 +105,15 @@ export const ATTACHMENT_NAME_SEPARATOR = ' / ';
 
 /** 支払方法が未設定のときの表示 */
 export const EMPTY_CELL_PLACEHOLDER = '';
+
+/**
+ * 「按分なし（税理士に依頼）」の経費で、按分率と経費計上額の代わりに置く表示。
+ *
+ * この状態は「按分率 100%」ではなく「按分をまだ決めていない」という意味なので、
+ * 100% と全額を書くと按分済みの経費と見分けがつかなくなる。
+ * 数値ではなく文字を入れることで、合計行の集計対象からも自動的に外れる。
+ */
+export const ALLOCATION_DELEGATED_CELL = '按分未対応';
 
 /** シート名のテンプレート（{period} は 2026 / 2026-08 のような表現） */
 export const EXPORT_SHEET_NAME_TEMPLATE = '経費明細_{period}';
