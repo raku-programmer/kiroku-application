@@ -92,6 +92,11 @@ export const listExpenses = (filter: ExpenseFilter): Expense[] => {
     conditions.push('e.payee_id = ?');
     params.push(filter.payeeId);
   }
+  if (filter.hasAttachment != null) {
+    // 添付は 1 件でもあれば「あり」。件数は数えず存在の有無だけを見る
+    const exists = `EXISTS (SELECT 1 FROM attachments a WHERE a.expense_id = e.id)`;
+    conditions.push(filter.hasAttachment ? exists : `NOT ${exists}`);
+  }
   const keyword = filter.keyword.trim();
   if (keyword.length > 0) {
     const escaped = keyword.replace(/[%_\\]/g, (match) => `\\${match}`);

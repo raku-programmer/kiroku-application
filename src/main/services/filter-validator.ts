@@ -43,6 +43,17 @@ const normalizeId = (value: unknown, label: string): number | null => {
   return value;
 };
 
+/** 指定なし（null）を許す真偽値の絞り込み */
+const normalizeFlag = (value: unknown, label: string): boolean | null => {
+  if (value == null) {
+    return null;
+  }
+  if (typeof value !== 'boolean') {
+    throw validationError(`${label}の指定が不正です。`);
+  }
+  return value;
+};
+
 /** renderer から受け取った絞り込み条件を検証・正規化する。 */
 export const normalizeExpenseFilter = (value: unknown): ExpenseFilter => {
   const raw = (value ?? {}) as Partial<ExpenseFilter>;
@@ -51,5 +62,6 @@ export const normalizeExpenseFilter = (value: unknown): ExpenseFilter => {
     accountCategoryId: normalizeId(raw.accountCategoryId, '勘定科目'),
     payeeId: normalizeId(raw.payeeId, '請求元'),
     keyword: typeof raw.keyword === 'string' ? raw.keyword : '',
+    hasAttachment: normalizeFlag(raw.hasAttachment, '領収書の添付'),
   };
 };

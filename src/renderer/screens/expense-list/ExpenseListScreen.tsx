@@ -6,6 +6,7 @@ import {
   CopyIcon,
   DownloadIcon,
   EyeIcon,
+  PaperclipIcon,
   TrashIcon,
   UploadIcon,
 } from '@renderer/components/icons/Icons';
@@ -61,8 +62,24 @@ const LIST_COLUMNS = [
   { key: 'payee', label: LABELS.list.columns.payee, numeric: false },
   { key: 'amount', label: LABELS.list.columns.amount, numeric: true },
   { key: 'tax', label: LABELS.list.columns.tax, numeric: false },
+  { key: 'attachment', label: LABELS.list.columns.attachment, numeric: false },
   { key: 'actions', label: LABELS.list.columns.actions, numeric: false },
 ] as const;
+
+/**
+ * 領収書の添付有無で絞り込むときの選択肢。
+ * select の値は文字列しか持てないため、表示値と filter の値をここで対応づける。
+ */
+const ATTACHMENT_FILTER_OPTIONS = [
+  { value: 'any', label: LABELS.list.filterAll, hasAttachment: null },
+  { value: 'present', label: LABELS.list.filterAttachmentPresent, hasAttachment: true },
+  { value: 'absent', label: LABELS.list.filterAttachmentAbsent, hasAttachment: false },
+] as const;
+
+/** filter の値から select に表示する値を引く */
+const toAttachmentFilterValue = (hasAttachment: boolean | null): string =>
+  ATTACHMENT_FILTER_OPTIONS.find((option) => option.hasAttachment === hasAttachment)?.value ??
+  ATTACHMENT_FILTER_OPTIONS[0].value;
 
 const EMPTY_RESULT: ExpenseListResult = {
   expenses: [],
@@ -131,6 +148,7 @@ export const ExpenseListScreen = ({
         accountCategoryId: null,
         payeeId: null,
         keyword: '',
+        hasAttachment: null,
       },
   );
   const [page, setPage] = useState(() => initialState?.page ?? FIRST_PAGE);
@@ -406,6 +424,28 @@ export const ExpenseListScreen = ({
             </select>
           </label>
 
+          <label className="list-filters__item">
+            <span className="list-filters__label">{LABELS.list.filterAttachment}</span>
+            <select
+              className="select"
+              value={toAttachmentFilterValue(filter.hasAttachment)}
+              onChange={(event) =>
+                updateFilter({
+                  hasAttachment:
+                    ATTACHMENT_FILTER_OPTIONS.find(
+                      (option) => option.value === event.target.value,
+                    )?.hasAttachment ?? null,
+                })
+              }
+            >
+              {ATTACHMENT_FILTER_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
           <label className="list-filters__item list-filters__item--grow">
             <span className="list-filters__label">{LABELS.list.filterKeyword}</span>
             <input
@@ -477,6 +517,7 @@ export const ExpenseListScreen = ({
               )}
               {pageExpenses.map((expense) => {
                 const categoryName = expense.accountCategoryName ?? UNCATEGORIZED_LABEL;
+                const attachmentCount = expense.attachments.length;
                 return (
                   <tr key={expense.id}>
                     <td>{formatDate(expense.expenseDate)}</td>
@@ -489,6 +530,21 @@ export const ExpenseListScreen = ({
                     <td>
                       {formatTaxTreatment(expense.taxTreatment)} /{' '}
                       {formatTaxRate(expense.taxTreatment, expense.taxRate)}
+                    </td>
+                    <td>
+                      {attachmentCount > 0 ? (
+                        <span className="list-table__attachment">
+                          <PaperclipIcon width={14} height={14} />
+                          {LABELS.list.attachmentPresent.replace(
+                            '{count}',
+                            String(attachmentCount),
+                          )}
+                        </span>
+                      ) : (
+                        <span className="list-table__attachment list-table__attachment--none">
+                          {LABELS.list.attachmentAbsent}
+                        </span>
+                      )}
                     </td>
                     <td>
                       <div className="list-table__actions">

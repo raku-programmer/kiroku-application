@@ -120,8 +120,24 @@
   width: 152px;
 }
 
+.list-table__col--attachment {
+  width: 92px;
+}
+
 .list-table__col--actions {
   width: 120px;
+}
+
+/* 添付の有無はアイコンと文字を並べて示す */
+.list-table__attachment {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-primary-800);
+}
+
+.list-table__attachment--none {
+  color: var(--color-text-muted);
 }
 
 .list-table thead th.numeric {

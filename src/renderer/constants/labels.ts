@@ -111,6 +111,10 @@ export const LABELS = {
     filterKeyword: 'キーワード',
     filterKeywordPlaceholder: '内容・備考・請求元で検索',
     filterAll: 'すべて',
+    /** 領収書（画像・PDF）の添付有無での絞り込み */
+    filterAttachment: '領収書',
+    filterAttachmentPresent: '添付あり',
+    filterAttachmentAbsent: '添付なし',
     download: 'Excelでダウンロード',
     downloading: 'Excelを作成しています…',
     downloaded: 'Excelを出力しました。',
@@ -128,7 +132,8 @@ export const LABELS = {
     deletedMessage: '経費を削除しました。',
     /**
      * 一覧の列。ここに載せない項目（内容・支払方法・税抜額・消費税額・按分率・
-     * 経費計上額・領収書）は経費照会画面で確認する。
+     * 経費計上額）は経費照会画面で確認する。
+     * 領収書は中身までは出さず、添付されているかどうかだけを示す。
      */
     columns: {
       date: '日付',
@@ -136,8 +141,12 @@ export const LABELS = {
       payee: '請求元',
       amount: '金額（税込）',
       tax: '税区分 / 税率',
+      attachment: '領収書',
       actions: '操作',
     },
+    /** 領収書の列に出す表示。添付ありは枚数を添える */
+    attachmentPresent: 'あり（{count}）',
+    attachmentAbsent: 'なし',
     pagination: {
       label: 'ページ送り',
       status: '{total} 件中 {start}〜{end} 件を表示',

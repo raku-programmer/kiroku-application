@@ -131,6 +131,12 @@ export interface ExpenseFilter {
   payeeId: number | null;
   /** 内容・備考・請求元名に対する部分一致 */
   keyword: string;
+  /**
+   * 領収書（画像・PDF）の添付有無での絞り込み。
+   * true = 添付あり、false = 添付なし、null = 問わない。
+   * 添付し忘れを探すのに使う。
+   */
+  hasAttachment: boolean | null;
 }
 
 /** 勘定科目別の小計 */

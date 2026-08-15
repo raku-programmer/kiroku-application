@@ -200,14 +200,23 @@ export const ExpenseDetailScreen = ({
       return;
     }
     setConfirmingDelete(false);
-    const removed = await commandAction.run(() => api.expenses.remove(expense.id), {
+    // 削除は Result<null> を返すため、run の戻り値では成否を区別できない。
+    // （成功しても null が返り、失敗時と同じ値になる）
+    let deleted = false;
+    await commandAction.run(() => api.expenses.remove(expense.id), {
       scope: LOADING_SCOPES.GLOBAL,
       loadingMessage: LABELS.common.processing,
       successMessage: LABELS.list.deletedMessage,
+      onSuccess: () => {
+        deleted = true;
+      },
     });
-    if (removed !== null) {
-      onNavigate(SCREEN_IDS.LIST);
+    if (!deleted) {
+      return;
     }
+    // 一覧へ戻す。絞り込みとページは App が預かったままなので、
+    // 戻った先で同じ条件のまま取得し直され、削除した行が消えた状態で表示される。
+    onNavigate(SCREEN_IDS.LIST);
   };
 
   if (!expense) {
